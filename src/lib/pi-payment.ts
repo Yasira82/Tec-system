@@ -32,7 +32,15 @@ export interface PaymentResult {
 // TODO(new app): set your app slug.
 const APP_SOURCE = 'system';
 
-const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL ?? 'https://hub.tecosystem.app';
+// Resolve the Hub URL defensively: a misconfigured env (e.g. the literal
+// placeholder `C_HUB_URL`, or an empty string) must NEVER become the redirect
+// target — it produces `C_HUB_URL/hub` → 404. Only accept a real http(s) URL;
+// otherwise fall back to the canonical Hub. (Fixes the July 2026 System 404.)
+const HUB_FALLBACK = 'https://hub.tecosystem.app';
+const HUB_URL = (() => {
+  const raw = process.env.NEXT_PUBLIC_HUB_URL;
+  return raw && /^https?:\/\//i.test(raw) ? raw.replace(/\/+$/, '') : HUB_FALLBACK;
+})();
 
 /**
  * ADR-007: true when the user arrived FROM the Hub (Pi session is foreign).

@@ -6,8 +6,14 @@ import { usePiAuth, ssoRedirect }  from '@yasser172/tec-auth';
 import { TEC_COLORS }              from '@yasser172/tec-ui';
 
 // ── تعديل حسب الـ domain ──────────────────────────────────
-const HUB_URL    = process.env.NEXT_PUBLIC_HUB_URL    ?? 'https://hub.tecosystem.app';
-const APP_URL    = process.env.NEXT_PUBLIC_APP_URL    ?? 'https://system.tecosystem.app';
+// Defensive: a misconfigured env (the literal placeholder `C_HUB_URL`, or an
+// empty string) must NEVER become a redirect target → it 404s. Accept only a
+// real http(s) URL; otherwise use the canonical fallback. (Fixes the System 404.)
+const httpOr = (raw: string | undefined, fallback: string): string =>
+  raw && /^https?:\/\//i.test(raw) ? raw.replace(/\/+$/, '') : fallback;
+
+const HUB_URL    = httpOr(process.env.NEXT_PUBLIC_HUB_URL, 'https://hub.tecosystem.app');
+const APP_URL    = httpOr(process.env.NEXT_PUBLIC_APP_URL, 'https://system.tecosystem.app');
 const APP_NAME   = process.env.NEXT_PUBLIC_APP_NAME   ?? 'TEC System';
 const APP_EMOJI  = process.env.NEXT_PUBLIC_APP_EMOJI  ?? '⚖️';
 

@@ -1,15 +1,69 @@
-# TEC Domain App Template — Claude Code Instructions
+# TEC System — Claude Code Instructions
 
-## What This Repo Is
+> ⚡ **SESSION START:** اقرأ `knowledge-base/C-02___CURRENT_STATE_.md` + **app charter
+> `knowledge-base/C-110___SYSTEM_INSTITUTIONAL_CHARTER.md`** من `yasira82/tec-knowledge-base` (branch: `main`).
 
-The **golden starter template** for a new app in the TEC Federated Platform.
-It ships a correct, Portal-ready skeleton: Hub SSO, dual-mode Pi payments,
-CSRF, legal pages, and CI policy guards. Clone it, run the "New app setup"
-checklist below, and you have a compliant app — no missing pieces.
+## What This App Is
 
-**Reference of record:** `yasira82/tec-knowledge-base` — especially
-`C-12_Dual_Mode_Payment.md` (payment + anti-regression) and
-`audits/PORTAL_SUBMISSION_RUNBOOK_*.md`.
+**The Constitution Runtime** of the TEC platform (C-110) — the **Institutional
+Authority Layer**. C-47 (Kernel Spec) defines the rules; **SYSTEM makes them
+queryable, governs subscription tiers, and certifies capabilities (C-94)**. It
+answers one question:
+
+```
+"Is this actor / operation legitimate under the constitution?"
+```
+
+Built from `tec-template-base` (Next.js 15 frontend).
+
+**Current Phase: System V0/V1 — Governance Console (read-only).** Identity / domain /
+slug / legal + a **read-only Governance Console**: policy registry (the 10 C-47
+Forbidden Behaviors as machine-readable policies), subscription-tier gating map
+(FREE/PRO/ENTERPRISE), capability registry (C-94), + a `/policy/[id]` detail page.
+Not yet deployed.
+
+> **SYSTEM is admin-first governance, not a consumer app.** Revenue is **indirect**
+> (ecosystem trust + subscription-gating enforcement, C-110 §7) — there is **no
+> consumer "Pro" payment surface**. The payment scaffold (`src/lib/pi-payment.ts`,
+> ADR-007 guard, BFF payment routes) is retained for compliance/optionality only.
+
+---
+
+## Pi App Identity
+
+| Field | Value |
+|-------|-------|
+| **App** | TEC System |
+| **Domain** | `https://system.tecosystem.app` |
+| **Pi App ID** | ⏳ TBD — register at Pi Developer Portal (if submitted) · then Vercel `NEXT_PUBLIC_PI_APP_ID` |
+| **APP_SOURCE slug** | `system` (payment-service resolves `PI_API_KEY_SYSTEM` — only if a payment is ever added) |
+| **PI_SANDBOX** | `false` (Mainnet) |
+
+---
+
+## System-Specific Rules (C-110)
+
+### The governance boundary — SYSTEM defines + audits; it does NOT enforce or execute
+SYSTEM **OWNS**: policy definitions + versioning, actor activation, subscription-tier
+capability gating, capability certification (C-94), governance-workflow execution,
+violation-response authority, admin audit trail. SYSTEM does **NOT OWN**:
+- **Technical enforcement** → each service self-enforces against policy.
+- **Business logic** → the domain services.
+- **Payment processing** → `tec-payment-service`; **identity** → `tec-auth-service` (§4).
+
+### Read vs write (P6)
+The console is **read-only**. Policy/capability/tier **writes** require an **AdminActor
++ mandatory audit trail** (immutable, retained forever) and a **2-person approval for
+destructive ops** — those live in the backend governance service (`tec-governance-service`,
+C-110 §5), **not in this frontend**. Admin access = CEO authority (C-47).
+
+### Subscription gating (C-110 §5, P0-1)
+Feature gating (FREE/PRO/ENTERPRISE) is checked **server-side in BFF routes — never on
+the client**. SYSTEM is the authority for the capability→tier map; apps query it.
+
+**Reference of record:** `yasira82/tec-knowledge-base` —
+`C-110___SYSTEM_INSTITUTIONAL_CHARTER.md` (charter) + `C-47` (Kernel Spec, policy
+source of truth) + `C-94` (capability registry) + `C-123` (session/cookies).
 
 ---
 

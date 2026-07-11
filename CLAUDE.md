@@ -23,9 +23,12 @@ Forbidden Behaviors as machine-readable policies), subscription-tier gating map
 Not yet deployed.
 
 > **SYSTEM is admin-first governance, not a consumer app.** Revenue is **indirect**
-> (ecosystem trust + subscription-gating enforcement, C-110 §7) — there is **no
-> consumer "Pro" payment surface**. The payment scaffold (`src/lib/pi-payment.ts`,
-> ADR-007 guard, BFF payment routes) is retained for compliance/optionality only.
+> (ecosystem trust + subscription-gating enforcement, C-110 §7). It sells **no
+> governance authority**: the only payment is a **voluntary "Support TEC Governance"
+> contribution** (`SystemSupporter`, 1π) that grants nothing privileged — it exists
+> to satisfy the Pi Portal "Process a Transaction" step. Policy writes stay
+> AdminActor + audit-trail only (C-110 §5). Approve under `PI_API_KEY_SYSTEM`
+> (never the default Hub key — the Analytics approve→502 lesson, C-12 §11).
 
 ---
 

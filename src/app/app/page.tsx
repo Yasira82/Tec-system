@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePiAuth } from '@yasser172/tec-auth';
 import { TEC_COLORS } from '@yasser172/tec-ui';
+import { SystemSupporter } from './components/SystemSupporter';
 import {
   POLICIES, TIERS, CAPABILITIES, STATUS_META,
   type Policy, type TierDef, type Capability,
@@ -57,6 +58,10 @@ export default function SystemConsole() {
             changes require an AdminActor + audit trail (backend governance service, C-110 §5).
           </p>
         </header>
+
+        {/* System Supporter — a real Pi U2A payment (voluntary; grants no authority).
+            Satisfies the Pi Portal "Process a Transaction" step. */}
+        <SystemSupporter />
 
         {/* Policy registry — the 10 Forbidden Behaviors (C-47) as policies. */}
         <section style={{ marginTop: 26 }}>

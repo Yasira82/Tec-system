@@ -6,10 +6,14 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { TEC_COLORS } from '@yasser172/tec-ui';
 import { getPolicy, POLICIES } from '@/lib/system/constitution';
+import { resolvePolicy } from '@/lib/system/server';
 
+// Pre-render the curated C-47 policy ids; allow live-only backend policies to render
+// on demand (the governance projection is the registry of record — C-110 §5).
 export function generateStaticParams() {
   return POLICIES.map((p) => ({ id: p.id }));
 }
+export const dynamicParams = true;
 
 export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> },
@@ -26,7 +30,9 @@ export default async function PolicyPage(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const p = getPolicy(id);
+  // Resolve from the live governance projection; fall back to the curated C-47
+  // registry so the page never 500s. A live 404 is authoritative → "not found".
+  const { policy: p } = await resolvePolicy(id);
 
   const wrap: React.CSSProperties = {
     minHeight: '100vh', background: TEC_COLORS.bg, color: TEC_COLORS.text,

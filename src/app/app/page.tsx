@@ -20,17 +20,23 @@ export default function SystemConsole() {
   const { user, isLoading } = usePiAuth();
   const name = user?.piUsername ? `@${user.piUsername}` : 'there';
 
-  const [policies, setPolicies] = useState<Policy[]>(POLICIES);
-  const [source,   setSource]   = useState<'sample' | 'live'>('sample');
+  const [policies,     setPolicies]     = useState<Policy[]>(POLICIES);
+  const [tiers,        setTiers]        = useState<TierDef[]>(TIERS);
+  const [capabilities, setCapabilities] = useState<Capability[]>(CAPABILITIES);
+  const [source,       setSource]       = useState<'sample' | 'live'>('sample');
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const res  = await fetch('/api/bff/system/policies', { credentials: 'include' });
+        // The whole read projection (policies + tiers + capabilities) in one call —
+        // live from the backend governance projection, or the curated C-47 fallback.
+        const res  = await fetch('/api/bff/system/constitution', { credentials: 'include' });
         const data = await res.json().catch(() => null);
-        if (!alive || !data || !Array.isArray(data.policies)) return;
-        setPolicies(data.policies as Policy[]);
+        if (!alive || !data) return;
+        if (Array.isArray(data.policies))     setPolicies(data.policies as Policy[]);
+        if (Array.isArray(data.tiers))        setTiers(data.tiers as TierDef[]);
+        if (Array.isArray(data.capabilities)) setCapabilities(data.capabilities as Capability[]);
         setSource(data.source === 'live' ? 'live' : 'sample');
       } catch { /* keep the constitution projection */ }
     })();
@@ -96,7 +102,7 @@ export default function SystemConsole() {
             gating is checked server-side in BFF routes — never on the client (C-110 §5).
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {TIERS.map((t: TierDef) => (
+            {tiers.map((t: TierDef) => (
               <div key={t.tier} style={card}>
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 14, fontWeight: 900, color: TEC_COLORS.gold }}>{t.tier}</span>
@@ -116,7 +122,7 @@ export default function SystemConsole() {
         <section style={{ marginTop: 28 }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Capability Registry <span style={{ fontSize: 12, color: TEC_COLORS.subtext, fontWeight: 600 }}>(C-94)</span></h2>
           <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
-            {CAPABILITIES.map((c: Capability) => {
+            {capabilities.map((c: Capability) => {
               const st = STATUS_META[c.governanceStatus];
               return (
                 <div key={c.id} style={card}>

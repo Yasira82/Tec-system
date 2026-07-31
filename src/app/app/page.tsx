@@ -7,6 +7,7 @@
 // governance service (C-110 §5/§10) — not here. SYSTEM defines policy; each
 // service self-enforces; SYSTEM never processes payments (§4).
 import Link from 'next/link';
+import { InviteCard } from '@/components/referral/InviteCard';
 import { useEffect, useState } from 'react';
 import { usePiAuth } from '@yasser172/tec-auth';
 import { TEC_COLORS } from '@yasser172/tec-ui';
@@ -146,6 +147,7 @@ export default function SystemConsole() {
           (→ tec-auth-service) — C-110 §4. Policy writes + admin actions need an AdminActor
           + immutable audit trail (backend governance service, not built here).
         </p>
+        <InviteCard />
       </div>
     </main>
   );

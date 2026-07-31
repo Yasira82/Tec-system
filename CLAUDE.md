@@ -20,7 +20,7 @@ Built from `tec-template-base` (Next.js 15 frontend).
 slug / legal + a **read-only Governance Console**: policy registry (the 10 C-47
 Forbidden Behaviors as machine-readable policies), subscription-tier gating map
 (FREE/PRO/ENTERPRISE), capability registry (C-94), + a `/policy/[id]` detail page.
-Not yet deployed.
+Deployed (Mainnet) · Pi App ID registered · env set · payment live · referral growth loop wired (C-133).
 
 > **SYSTEM is admin-first governance, not a consumer app.** Revenue is **indirect**
 > (ecosystem trust + subscription-gating enforcement, C-110 §7). It sells **no
@@ -38,7 +38,7 @@ Not yet deployed.
 |-------|-------|
 | **App** | TEC System |
 | **Domain** | `https://system.tecosystem.app` |
-| **Pi App ID** | ⏳ TBD — register at Pi Developer Portal (if submitted) · then Vercel `NEXT_PUBLIC_PI_APP_ID` |
+| **Pi App ID** | ✅ Registered (Mainnet) · Vercel `NEXT_PUBLIC_PI_APP_ID` |
 | **APP_SOURCE slug** | `system` (payment-service resolves `PI_API_KEY_SYSTEM` — only if a payment is ever added) |
 | **PI_SANDBOX** | `false` (Mainnet) |
 

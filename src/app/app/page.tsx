@@ -7,6 +7,7 @@
 // governance service (C-110 §5/§10) — not here. SYSTEM defines policy; each
 // service self-enforces; SYSTEM never processes payments (§4).
 import Link from 'next/link';
+import { InviteCard } from '@/components/referral/InviteCard';
 import { useEffect, useState } from 'react';
 import { usePiAuth } from '@yasser172/tec-auth';
 import { TEC_COLORS } from '@yasser172/tec-ui';
@@ -23,7 +24,7 @@ export default function SystemConsole() {
   const [policies,     setPolicies]     = useState<Policy[]>(POLICIES);
   const [tiers,        setTiers]        = useState<TierDef[]>(TIERS);
   const [capabilities, setCapabilities] = useState<Capability[]>(CAPABILITIES);
-  const [source,       setSource]       = useState<'sample' | 'live'>('sample');
+  const [source,       setSource]       = useState<'projection' | 'live'>('projection');
 
   useEffect(() => {
     let alive = true;
@@ -37,7 +38,7 @@ export default function SystemConsole() {
         if (Array.isArray(data.policies))     setPolicies(data.policies as Policy[]);
         if (Array.isArray(data.tiers))        setTiers(data.tiers as TierDef[]);
         if (Array.isArray(data.capabilities)) setCapabilities(data.capabilities as Capability[]);
-        setSource(data.source === 'live' ? 'live' : 'sample');
+        setSource(data.source === 'live' ? 'live' : 'projection');
       } catch { /* keep the constitution projection */ }
     })();
     return () => { alive = false; };
@@ -146,6 +147,7 @@ export default function SystemConsole() {
           (→ tec-auth-service) — C-110 §4. Policy writes + admin actions need an AdminActor
           + immutable audit trail (backend governance service, not built here).
         </p>
+        <InviteCard />
       </div>
     </main>
   );

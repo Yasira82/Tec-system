@@ -58,21 +58,21 @@ async function gwGet(path: string): Promise<Record<string, unknown> | null> {
   return null;
 }
 
-export interface ResolvedPolicies { policies: Policy[]; source: 'live' | 'sample'; }
+export interface ResolvedPolicies { policies: Policy[]; source: 'live' | 'projection'; }
 
 // The policy registry — live backend first, curated C-47 projection as fallback.
 export async function resolvePolicies(): Promise<ResolvedPolicies> {
   const data = await gwGet('/api/identity/system/policies');
   const rows = data?.policies;
   if (Array.isArray(rows)) return { policies: rows.map((p) => policyFromBackend(p as Record<string, unknown>)), source: 'live' };
-  return { policies: POLICIES, source: 'sample' };
+  return { policies: POLICIES, source: 'projection' };
 }
 
 export interface ResolvedConstitution {
   policies:     Policy[];
   tiers:        TierDef[];
   capabilities: Capability[];
-  source:       'live' | 'sample';
+  source:       'live' | 'projection';
 }
 
 // The whole read projection (policies + tiers + capabilities) in one call.
@@ -87,10 +87,10 @@ export async function resolveConstitution(): Promise<ResolvedConstitution> {
       source:       'live',
     };
   }
-  return { policies: POLICIES, tiers: TIERS, capabilities: CAPABILITIES, source: 'sample' };
+  return { policies: POLICIES, tiers: TIERS, capabilities: CAPABILITIES, source: 'projection' };
 }
 
-export interface ResolvedPolicy { policy: Policy | null; source: 'live' | 'sample'; }
+export interface ResolvedPolicy { policy: Policy | null; source: 'live' | 'projection'; }
 
 // One policy by id — live backend first, sample fallback. A live 404 is
 // authoritative (policy: null, source: 'live').
@@ -107,5 +107,5 @@ export async function resolvePolicy(id: string): Promise<ResolvedPolicy> {
       if (res.status === 404) return { policy: null, source: 'live' };
     } catch { /* fall through to the curated projection */ }
   }
-  return { policy: getPolicy(id), source: 'sample' };
+  return { policy: getPolicy(id), source: 'projection' };
 }

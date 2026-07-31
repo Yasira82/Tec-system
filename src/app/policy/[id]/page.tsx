@@ -5,15 +5,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { TEC_COLORS } from '@yasser172/tec-ui';
-import { getPolicy, POLICIES } from '@/lib/system/constitution';
+import { getPolicy } from '@/lib/system/constitution';
 import { resolvePolicy } from '@/lib/system/server';
 
-// Pre-render the curated C-47 policy ids; allow live-only backend policies to render
-// on demand (the governance projection is the registry of record — C-110 §5).
-export function generateStaticParams() {
-  return POLICIES.map((p) => ({ id: p.id }));
-}
-export const dynamicParams = true;
+// Rendered dynamically from the live governance projection (resolvePolicy does a
+// no-store gateway fetch); a live 404 is authoritative → notFound(). The policies
+// are the canonical C-47 constitution — definitional content, not user data.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> },

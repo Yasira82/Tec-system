@@ -20,7 +20,7 @@ export async function generateMetadata(
   const p = getPolicy(id);
   return {
     title:       p ? `${p.id} — TEC System policy` : 'TEC System — Policy',
-    description: p ? p.rule : 'A TEC platform governance policy (C-110).',
+    description: p? p.rule: 'A TEC platform governance policy.',
   };
 }
 
@@ -81,8 +81,8 @@ export default async function PolicyPage(
           <div style={factCard}>
             <div style={{ fontSize: 13, fontWeight: 800, color: TEC_COLORS.text }}>Enforcement class</div>
             <div style={{ fontSize: 12, color: TEC_COLORS.subtext, marginTop: 5, lineHeight: 1.5 }}>
-              {hard
-                ? 'Hard — the owning service rejects a non-compliant request immediately (C-110 §5).'
+              {hard?
+                'Hard — the owning service rejects a non-compliant request immediately.'
                 : 'Soft — the service logs the violation and continues (legacy compatibility).'}
             </div>
           </div>

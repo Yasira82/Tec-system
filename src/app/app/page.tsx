@@ -75,7 +75,7 @@ export default function SystemConsole() {
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Policy Registry</h2>
             <span style={{ fontSize: 11, color: TEC_COLORS.subtext, border: `1px solid ${TEC_COLORS.gold}33`, borderRadius: 999, padding: '2px 10px' }}>
-              {source === 'live' ? 'live · governance-service' : 'C-47 projection'} · {policies.length} policies
+              {source === 'live'? 'live · governance-service': 'C-47 projection'} · {policies.length} policies
             </span>
           </div>
           <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
@@ -100,7 +100,7 @@ export default function SystemConsole() {
           <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Subscription Tiers</h2>
           <p style={{ fontSize: 12, color: TEC_COLORS.subtext, margin: '6px 0 12px', lineHeight: 1.5 }}>
             The canonical capability map SYSTEM is the authority for. Apps query it;
-            gating is checked server-side in BFF routes — never on the client (C-110 §5).
+            gating is checked server-side in BFF routes — never on the client.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
             {tiers.map((t: TierDef) => (
@@ -121,7 +121,7 @@ export default function SystemConsole() {
 
         {/* Capability registry — C-94 lifecycle. */}
         <section style={{ marginTop: 28 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Capability Registry <span style={{ fontSize: 12, color: TEC_COLORS.subtext, fontWeight: 600 }}>(C-94)</span></h2>
+          <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Capability Registry <span style={{ fontSize: 12, color: TEC_COLORS.subtext, fontWeight: 600 }}></span></h2>
           <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
             {capabilities.map((c: Capability) => {
               const st = STATUS_META[c.governanceStatus];

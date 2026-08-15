@@ -55,14 +55,14 @@ export default function SystemConsole() {
     <main style={{ minHeight: '100vh', background: TEC_COLORS.bg, color: TEC_COLORS.text, padding: '32px 22px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div style={{ maxWidth: 780, margin: '0 auto' }}>
         <header>
-          <div style={{ fontSize: 12, letterSpacing: 1, color: TEC_COLORS.subtext, textTransform: 'uppercase' }}>TEC System · Constitution Runtime</div>
+          <div style={{ fontSize: 12, letterSpacing: 1, color: TEC_COLORS.subtext, textTransform: 'uppercase' }}>TEC System · Governance</div>
           <h1 style={{ fontSize: 26, fontWeight: 900, color: TEC_COLORS.gold, margin: '6px 0 0' }}>
             {isLoading ? 'Governance Console' : `Governance Console, ${name}`}
           </h1>
           <p style={{ fontSize: 14, color: TEC_COLORS.subtext, margin: '6px 0 0', lineHeight: 1.6 }}>
-            SYSTEM makes the C-47 constitution queryable at runtime. This console is
-            <strong style={{ color: TEC_COLORS.text }}> read-only</strong>: policy
-            changes require an AdminActor + audit trail (backend governance service, C-110 §5).
+            System makes the platform&apos;s rules easy to look up. This console is
+            <strong style={{ color: TEC_COLORS.text }}> read-only</strong> — changes are
+            made by administrators with a full audit trail.
           </p>
         </header>
 
@@ -75,7 +75,7 @@ export default function SystemConsole() {
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Policy Registry</h2>
             <span style={{ fontSize: 11, color: TEC_COLORS.subtext, border: `1px solid ${TEC_COLORS.gold}33`, borderRadius: 999, padding: '2px 10px' }}>
-              {source === 'live'? 'live · governance-service': 'C-47 projection'} · {policies.length} policies
+              {source === 'live'? 'live': 'read-only'} · {policies.length} policies
             </span>
           </div>
           <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
@@ -100,7 +100,7 @@ export default function SystemConsole() {
           <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Subscription Tiers</h2>
           <p style={{ fontSize: 12, color: TEC_COLORS.subtext, margin: '6px 0 12px', lineHeight: 1.5 }}>
             The canonical capability map SYSTEM is the authority for. Apps query it;
-            gating is checked server-side in BFF routes — never on the client.
+            access is always checked securely on the server.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
             {tiers.map((t: TierDef) => (
@@ -142,10 +142,9 @@ export default function SystemConsole() {
         </section>
 
         <p style={{ fontSize: 11, color: TEC_COLORS.subtext, margin: '24px 0 0', lineHeight: 1.5 }}>
-          SYSTEM defines and audits policy; it does NOT enforce (each service self-enforces
-          against policy), process payments (→ tec-payment-service), or verify identity
-          (→ tec-auth-service) — C-110 §4. Policy writes + admin actions need an AdminActor
-          + immutable audit trail (backend governance service, not built here).
+          System defines and publishes the platform&apos;s rules. It doesn&apos;t process
+          payments or verify identity itself — those are handled by their dedicated
+          systems. Rule changes are made by administrators with a full audit trail.
         </p>
         <InviteCard />
       </div>

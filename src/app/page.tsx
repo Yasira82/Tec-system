@@ -48,7 +48,7 @@ export default function HomePage() {
           TEC ECOSYSTEM · GOVERNANCE
         </div>
         <div style={{ fontSize: 13, color: TEC_COLORS.subtext, marginBottom: 32, maxWidth: 320, lineHeight: 1.5 }}>
-          The Constitution Runtime — policies, subscription tiers, and capability
+          The platform&apos;s rulebook — policies, subscription tiers, and capability
           governance for the TEC platform.
         </div>
         <button

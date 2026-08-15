@@ -67,11 +67,11 @@ export interface Capability {
 }
 
 export const CAPABILITIES: Capability[] = [
-  { id: 'payment',        owner: 'tec-payment-service', governanceStatus: 'certified', note: 'Pi payment lifecycle — outbox + state machine (ADR-004).' },
-  { id: 'authentication', owner: 'tec-auth-service',    governanceStatus: 'certified', note: 'Pi identity + JWT issuance (ADR-002).' },
+  { id: 'payment',        owner: 'tec-payment-service', governanceStatus: 'certified', note: 'Pi payment lifecycle — outbox + state machine.' },
+  { id: 'authentication', owner: 'tec-auth-service',    governanceStatus: 'certified', note: 'Pi identity + JWT issuance.' },
   { id: 'asset-transfer', owner: 'tec-asset-service',   governanceStatus: 'verified',  note: 'Ownership transfer requires verified payment.' },
   { id: 'order-creation', owner: 'tec-commerce-service', governanceStatus: 'verified', note: 'Order created only after payment approved.' },
-  { id: 'analytics-query', owner: 'tec-analytics-service', governanceStatus: 'designed', note: 'Read-only aggregates; eventual consistency.' },
+  { id: 'analytics-query', owner: 'tec-analytics-service', governanceStatus: 'designed', note: 'Read-only aggregates; updates periodically.' },
 ];
 
 export const STATUS_META: Record<GovernanceStatus, { label: string; tone: 'good' | 'mid' | 'low' }> = {

@@ -5,7 +5,7 @@ import '@/styles/tec-design-tokens.css';
 
 export const metadata: Metadata = {
   title:       'TEC System — Governance Console',
-  description: 'The Constitution Runtime of the TEC platform: policy registry, subscription-tier gating, and capability governance.',
+  description: 'The governance console for the TEC platform: policies, subscription tiers, and capabilities.',
 };
 
 export default function RootLayout({

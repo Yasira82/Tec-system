@@ -125,7 +125,7 @@ export function SystemSupporter() {
       <div style={{ fontSize: 12, color: TEC_COLORS.subtext, marginTop: 8, lineHeight: 1.5 }}>
         A voluntary contribution to support platform governance. It grants
         <strong style={{ color: TEC_COLORS.text }}> no policy authority</strong> and unlocks nothing
-        privileged — governance writes stay AdminActor-only (C-110 §5).
+        privileged — rule changes stay with administrators only.
       </div>
 
       <button

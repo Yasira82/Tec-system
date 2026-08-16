@@ -19,7 +19,7 @@ import {
 
 export default function SystemConsole() {
   const { user, isLoading } = usePiAuth();
-  const name = user?.piUsername ? `@${user.piUsername}` : 'there';
+  const name = user?.piUsername ? `@${user.piUsername}` : '';
 
   const [policies,     setPolicies]     = useState<Policy[]>(POLICIES);
   const [tiers,        setTiers]        = useState<TierDef[]>(TIERS);
@@ -57,7 +57,7 @@ export default function SystemConsole() {
         <header>
           <div style={{ fontSize: 12, letterSpacing: 1, color: TEC_COLORS.subtext, textTransform: 'uppercase' }}>TEC System · Governance</div>
           <h1 style={{ fontSize: 26, fontWeight: 900, color: TEC_COLORS.gold, margin: '6px 0 0' }}>
-            {isLoading ? 'Governance Console' : `Governance Console, ${name}`}
+            {isLoading || !name ? 'Governance Console' : `Governance Console, ${name}`}
           </h1>
           <p style={{ fontSize: 14, color: TEC_COLORS.subtext, margin: '6px 0 0', lineHeight: 1.6 }}>
             System makes the platform&apos;s rules easy to look up. This console is

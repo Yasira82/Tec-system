@@ -6,24 +6,29 @@
 // Policy WRITES require an AdminActor + audit trail and live in the backend
 // governance service (C-110 §5/§10) — not here. SYSTEM defines policy; each
 // service self-enforces; SYSTEM never processes payments (§4).
+// App shell: Policies / Tiers / Support / Settings bottom nav.
 import Link from 'next/link';
-import { InviteCard } from '@/components/referral/InviteCard';
 import { useEffect, useState } from 'react';
 import { usePiAuth } from '@yasser172/tec-auth';
 import { useMe } from '@/lib-client/hooks/useMe';
 import { TEC_COLORS } from '@yasser172/tec-ui';
+import { useTranslation } from '@/lib/i18n';
 import { SystemSupporter } from './components/SystemSupporter';
+import { BottomNav, type SystemTab } from './components/BottomNav';
+import { SettingsView } from './components/SettingsView';
 import {
   POLICIES, TIERS, CAPABILITIES, STATUS_META,
   type Policy, type TierDef, type Capability,
 } from '@/lib/system/constitution';
 
 export default function SystemConsole() {
+  const { t } = useTranslation();
   const { user, isLoading } = usePiAuth();
   const me = useMe(); // server-resolved Pi username (Pi Browser hides tec_user from client JS — C-123 §3)
   const piName = me.username ?? user?.piUsername ?? null;
   const name = piName ? `@${piName}` : '';
 
+  const [tab,          setTab]          = useState<SystemTab>('policies');
   const [policies,     setPolicies]     = useState<Policy[]>(POLICIES);
   const [tiers,        setTiers]        = useState<TierDef[]>(TIERS);
   const [capabilities, setCapabilities] = useState<Capability[]>(CAPABILITIES);
@@ -54,103 +59,116 @@ export default function SystemConsole() {
   const toneColor = (tone: 'good' | 'mid' | 'low') =>
     tone === 'good' ? TEC_COLORS.success : tone === 'mid' ? TEC_COLORS.gold : TEC_COLORS.subtext;
 
+  const headerTitle =
+    tab === 'tiers' ? t.system.nav.tiers
+    : tab === 'support' ? t.system.nav.support
+    : tab === 'settings' ? t.system.nav.settings
+    : (isLoading || !name ? 'Governance Console' : `Governance Console, ${name}`);
+
   return (
-    <main style={{ minHeight: '100vh', background: TEC_COLORS.bg, color: TEC_COLORS.text, padding: '32px 22px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <div style={{ maxWidth: 780, margin: '0 auto' }}>
+    <main style={{ minHeight: '100vh', background: TEC_COLORS.bg, color: TEC_COLORS.text, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div style={{ maxWidth: 780, margin: '0 auto', padding: '32px 22px calc(96px + env(safe-area-inset-bottom))' }}>
         <header>
-          <div style={{ fontSize: 12, letterSpacing: 1, color: TEC_COLORS.subtext, textTransform: 'uppercase' }}>TEC System · Governance</div>
-          <h1 style={{ fontSize: 26, fontWeight: 900, color: TEC_COLORS.gold, margin: '6px 0 0' }}>
-            {isLoading || !name ? 'Governance Console' : `Governance Console, ${name}`}
-          </h1>
-          <p style={{ fontSize: 14, color: TEC_COLORS.subtext, margin: '6px 0 0', lineHeight: 1.6 }}>
-            System makes the platform&apos;s rules easy to look up. This console is
-            <strong style={{ color: TEC_COLORS.text }}> read-only</strong> — changes are
-            made by administrators with a full audit trail.
-          </p>
+          <div style={{ fontSize: 12, letterSpacing: 1, color: TEC_COLORS.subtext, textTransform: 'uppercase' }}>{t.system.kicker}</div>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: TEC_COLORS.gold, margin: '6px 0 0' }}>{headerTitle}</h1>
+          {tab === 'policies' && (
+            <p style={{ fontSize: 14, color: TEC_COLORS.subtext, margin: '6px 0 0', lineHeight: 1.6 }}>{t.system.tagline}</p>
+          )}
         </header>
 
-        {/* System Supporter — a real Pi U2A payment (voluntary; grants no authority).
-            Satisfies the Pi Portal "Process a Transaction" step. */}
-        <SystemSupporter />
-
-        {/* Policy registry — the 10 Forbidden Behaviors (C-47) as policies. */}
-        <section style={{ marginTop: 26 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Policy Registry</h2>
-            <span style={{ fontSize: 11, color: TEC_COLORS.subtext, border: `1px solid ${TEC_COLORS.gold}33`, borderRadius: 999, padding: '2px 10px' }}>
-              {source === 'live'? 'live': 'read-only'} · {policies.length} policies
-            </span>
-          </div>
-          <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
-            {policies.map((p) => (
-              <Link key={p.id} href={`/policy/${p.id}`} style={{ ...card, display: 'block', textDecoration: 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: TEC_COLORS.text }}>
-                    <span style={{ color: TEC_COLORS.gold }}>{p.id}</span> · {p.domain}
-                  </span>
-                  <span style={{ fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', color: p.enforcement === 'hard' ? TEC_COLORS.error : TEC_COLORS.gold, border: `1px solid ${p.enforcement === 'hard' ? TEC_COLORS.error : TEC_COLORS.gold}55`, borderRadius: 999, padding: '2px 8px' }}>
-                    {p.enforcement === 'hard' ? '⛔ hard' : '⚠️ soft'}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12, color: TEC_COLORS.subtext, marginTop: 5, lineHeight: 1.5 }}>{p.rule}</div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Subscription tiers — SYSTEM enforces gating server-side (§5). */}
-        <section style={{ marginTop: 28 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Subscription Tiers</h2>
-          <p style={{ fontSize: 12, color: TEC_COLORS.subtext, margin: '6px 0 12px', lineHeight: 1.5 }}>
-            The canonical capability map SYSTEM is the authority for. Apps query it;
-            access is always checked securely on the server.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {tiers.map((t: TierDef) => (
-              <div key={t.tier} style={card}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: TEC_COLORS.gold }}>{t.tier}</span>
-                  <span style={{ fontSize: 11, color: TEC_COLORS.subtext }}>{t.priceHint}</span>
-                </div>
-                <ul style={{ margin: '8px 0 0', paddingLeft: 16 }}>
-                  {t.capabilities.map((c) => (
-                    <li key={c} style={{ fontSize: 12, color: TEC_COLORS.subtext, lineHeight: 1.7 }}>{c}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Capability registry — C-94 lifecycle. */}
-        <section style={{ marginTop: 28 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>Capability Registry <span style={{ fontSize: 12, color: TEC_COLORS.subtext, fontWeight: 600 }}></span></h2>
-          <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
-            {capabilities.map((c: Capability) => {
-              const st = STATUS_META[c.governanceStatus];
-              return (
-                <div key={c.id} style={card}>
+        {/* ── POLICIES ────────────────────────────────────────────── */}
+        {tab === 'policies' && (
+          <section style={{ marginTop: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>{t.system.policyRegistry}</h2>
+              <span style={{ fontSize: 11, color: TEC_COLORS.subtext, border: `1px solid ${TEC_COLORS.gold}33`, borderRadius: 999, padding: '2px 10px' }}>
+                {source === 'live' ? 'live' : 'read-only'} · {policies.length} policies
+              </span>
+            </div>
+            <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
+              {policies.map((p) => (
+                <Link key={p.id} href={`/policy/${p.id}`} style={{ ...card, display: 'block', textDecoration: 'none' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: TEC_COLORS.text }}>{c.id}</span>
-                    <span style={{ fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', color: toneColor(st.tone), border: `1px solid ${toneColor(st.tone)}55`, borderRadius: 999, padding: '2px 8px' }}>
-                      {st.label}
+                    <span style={{ fontSize: 13, fontWeight: 800, color: TEC_COLORS.text }}>
+                      <span style={{ color: TEC_COLORS.gold }}>{p.id}</span> · {p.domain}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', color: p.enforcement === 'hard' ? TEC_COLORS.error : TEC_COLORS.gold, border: `1px solid ${p.enforcement === 'hard' ? TEC_COLORS.error : TEC_COLORS.gold}55`, borderRadius: 999, padding: '2px 8px' }}>
+                      {p.enforcement === 'hard' ? '⛔ hard' : '⚠️ soft'}
                     </span>
                   </div>
-                  <div style={{ fontSize: 11, color: TEC_COLORS.gold, marginTop: 3 }}>owner: {c.owner}</div>
-                  <div style={{ fontSize: 12, color: TEC_COLORS.subtext, marginTop: 5, lineHeight: 1.5 }}>{c.note}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                  <div style={{ fontSize: 12, color: TEC_COLORS.subtext, marginTop: 5, lineHeight: 1.5 }}>{p.rule}</div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
-        <p style={{ fontSize: 11, color: TEC_COLORS.subtext, margin: '24px 0 0', lineHeight: 1.5 }}>
-          System defines and publishes the platform&apos;s rules. It doesn&apos;t process
-          payments or verify identity itself — those are handled by their dedicated
-          systems. Rule changes are made by administrators with a full audit trail.
-        </p>
-        <InviteCard />
+        {/* ── TIERS + CAPABILITIES ────────────────────────────────── */}
+        {tab === 'tiers' && (<>
+          {/* Subscription tiers — SYSTEM enforces gating server-side (§5). */}
+          <section style={{ marginTop: 20 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>{t.system.subscriptionTiers}</h2>
+            <p style={{ fontSize: 12, color: TEC_COLORS.subtext, margin: '6px 0 12px', lineHeight: 1.5 }}>
+              The canonical capability map SYSTEM is the authority for. Apps query it;
+              access is always checked securely on the server.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              {tiers.map((td: TierDef) => (
+                <div key={td.tier} style={card}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: TEC_COLORS.gold }}>{td.tier}</span>
+                    <span style={{ fontSize: 11, color: TEC_COLORS.subtext }}>{td.priceHint}</span>
+                  </div>
+                  <ul style={{ margin: '8px 0 0', paddingLeft: 16 }}>
+                    {td.capabilities.map((c) => (
+                      <li key={c} style={{ fontSize: 12, color: TEC_COLORS.subtext, lineHeight: 1.7 }}>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Capability registry — C-94 lifecycle. */}
+          <section style={{ marginTop: 28 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, color: TEC_COLORS.text, margin: 0 }}>{t.system.capabilityRegistry}</h2>
+            <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
+              {capabilities.map((c: Capability) => {
+                const st = STATUS_META[c.governanceStatus];
+                return (
+                  <div key={c.id} style={card}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: TEC_COLORS.text }}>{c.id}</span>
+                      <span style={{ fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', color: toneColor(st.tone), border: `1px solid ${toneColor(st.tone)}55`, borderRadius: 999, padding: '2px 8px' }}>
+                        {st.label}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 11, color: TEC_COLORS.gold, marginTop: 3 }}>owner: {c.owner}</div>
+                    <div style={{ fontSize: 12, color: TEC_COLORS.subtext, marginTop: 5, lineHeight: 1.5 }}>{c.note}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </>)}
+
+        {/* ── SUPPORT ─────────────────────────────────────────────── */}
+        {tab === 'support' && (<>
+          {/* System Supporter — a real Pi U2A payment (voluntary; grants no authority).
+              Satisfies the Pi Portal "Process a Transaction" step. */}
+          <div style={{ marginTop: 20 }}><SystemSupporter /></div>
+          <p style={{ fontSize: 11, color: TEC_COLORS.subtext, margin: '20px 0 0', lineHeight: 1.5 }}>
+            System defines and publishes the platform&apos;s rules. It doesn&apos;t process
+            payments or verify identity itself — those are handled by their dedicated
+            systems. Supporting TEC Governance is voluntary and grants no privileged access.
+          </p>
+        </>)}
+
+        {/* ── SETTINGS ────────────────────────────────────────────── */}
+        {tab === 'settings' && <SettingsView />}
       </div>
+
+      <BottomNav active={tab} onSelect={setTab} />
     </main>
   );
 }

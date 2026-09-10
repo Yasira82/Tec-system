@@ -37,6 +37,8 @@ const APP_SOURCE = 'system';
 // target — it produces `C_HUB_URL/hub` → 404. Only accept a real http(s) URL;
 // otherwise fall back to the canonical Hub. (Fixes the July 2026 System 404.)
 const HUB_FALLBACK = 'https://hub.tecosystem.app';
+import { hubPaymentOrigin } from '@/lib/pi-network';
+
 const HUB_URL = (() => {
   const raw = process.env.NEXT_PUBLIC_HUB_URL;
   return raw && /^https?:\/\//i.test(raw) ? raw.replace(/\/+$/, '') : HUB_FALLBACK;
@@ -68,7 +70,7 @@ export const redirectToHubPayment = (params: {
     item:   params.itemId,
     ...(params.memo ? { memo: params.memo } : {}),
   });
-  window.location.href = `${HUB_URL}/hub?${q.toString()}`;
+  window.location.href = `${hubPaymentOrigin(HUB_URL)}/hub?${q.toString()}`;
 };
 
 /** Step 1 — create the payment record in tec-payment-service; returns internal id. */

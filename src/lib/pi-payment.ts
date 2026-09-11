@@ -75,6 +75,12 @@ export const redirectToHubPayment = (params: {
     source: APP_SOURCE,
     amount: String(params.amount),
     item:   params.itemId,
+    // Where the Hub sends the user back — on Cancel AND on success. Omitting it
+    // left the Hub defaulting to its OWN /hub, so cancelling a payment that
+    // started here dropped the user on the Hub: they never left this app in
+    // their mind, and the app never learned the outcome (`/app` is where
+    // ?payment_status is read). Always say where home is.
+    return_url: `${window.location.origin}/app`,
     ...(params.memo ? { memo: params.memo } : {}),
   });
   window.location.href = `${hubPaymentOrigin(HUB_URL)}/hub?${q.toString()}`;

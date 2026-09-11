@@ -1,5 +1,6 @@
 import { PiAuthResult, TecAuthResponse, PiPaymentData, PiPaymentCallbacks } from '@/types/pi.types';
 import sdk from '@/lib/sdk';
+import { piSession } from '@/lib/pi/pi-session';
 
 declare global {
   interface Window {
@@ -301,7 +302,14 @@ const authenticateWithTimeout = async (timeout?: number): Promise<PiAuthResult> 
       reject(new Error(isPiBrowser() ? ERRORS.AUTH_TIMEOUT : ERRORS.NOT_PI_BROWSER));
     }, effectiveTimeout);
     window.Pi.authenticate(['username', 'payments'], handleIncompletePayment)
-      .then(result => { clearTimeout(timer); resolve(result); })
+      .then(result => {
+        clearTimeout(timer);
+        // Login authenticates with the SAME scopes a payment needs. Recording
+        // it here is what stops the first Pay tap from running a second,
+        // redundant handshake.
+        piSession.markAuthenticated();
+        resolve(result);
+      })
       .catch(err   => { clearTimeout(timer); reject(err);     });
   });
 };

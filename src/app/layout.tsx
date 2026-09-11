@@ -24,6 +24,12 @@ export default function RootLayout({
             no white frame shows around the app in Pi Browser. */}
         <meta name="theme-color" content="#050816" />
         <meta name="color-scheme" content="dark" />
+        {/* A Mode-1 payment (ADR-007) leaves this origin entirely: the Pay tap
+            navigates to the Hub. Opening that cross-origin connection now means
+            the navigation is not also paying for DNS + TLS at the moment the
+            user is waiting on it. Costs nothing when Mode 2 is used instead. */}
+        <link rel="preconnect" href="https://hub.tecosystem.app" />
+        <link rel="preconnect" href="https://tec-app-frontend.vercel.app" />
         <script
           src="https://sdk.minepi.com/pi-sdk.js"
           async

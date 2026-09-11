@@ -30,10 +30,8 @@ export default function RootLayout({
             user is waiting on it. Costs nothing when Mode 2 is used instead. */}
         <link rel="preconnect" href="https://hub.tecosystem.app" />
         <link rel="preconnect" href="https://tec-app-frontend.vercel.app" />
-        <script
-          src="https://sdk.minepi.com/pi-sdk.js"
-          async
-        />
+        {/* The Pi SDK is NOT loaded here. It is injected below, and ONLY when
+            this is not a Hub-owned session — see the note in that script. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -55,6 +53,20 @@ export default function RootLayout({
                   __fromHub = !!document.referrer &&
                     __hubHosts.indexOf(new URL(document.referrer).hostname.toLowerCase()) !== -1;
                 } catch (e) {}
+                //
+                // And in that session the SDK is not merely left un-init'd —
+                // it is NOT LOADED AT ALL. Skipping init while still pulling
+                // pi-sdk.js opened Pi's bridge on this origin anyway, which is
+                // enough to contest the Pi app context the Hub is holding: the
+                // Mode-1 bounce back to the Hub then had to switch context
+                // before it could authenticate, and THAT is the long wait the
+                // user sees (the Hub trace stops at "warming the Pi session"
+                // and nothing follows). ADR-007 says an app in a Hub-owned
+                // session must not touch Pi — loading its SDK is touching it.
+                //
+                // Fail-safe by construction: no SDK here means every buy
+                // handler already refuses Mode 2 and bounces to the Hub, which
+                // is exactly what ADR-007 requires of this session anyway.
                 try {
                   if (sessionStorage.getItem('__tec_hub_entry') === '1' || __fromHub) {
                     window.__TEC_PI_FOREIGN_SESSION = true;
@@ -63,7 +75,14 @@ export default function RootLayout({
                     return;
                   }
                 } catch(e) {}
-                if (typeof window.Pi !== 'undefined') {
+
+                // Standalone session — load the SDK now, then init it.
+                var __boot = function () {
+                  if (typeof window.Pi === 'undefined') {
+                    window.__TEC_PI_ERROR = true;
+                    window.dispatchEvent(new Event('tec-pi-error'));
+                    return;
+                  }
                   try {
                     var __isTestnetHost = /\\.vercel\\.app$/i.test(location.hostname);
                     // SANDBOX IS NOT TESTNET. The HOST decides which Pi APP the
@@ -92,7 +111,18 @@ export default function RootLayout({
                     window.__TEC_PI_ERROR = true;
                     window.dispatchEvent(new Event('tec-pi-error'));
                   }
-                }
+                };
+
+                if (typeof window.Pi !== 'undefined') { __boot(); return; }
+                var __s = document.createElement('script');
+                __s.src   = 'https://sdk.minepi.com/pi-sdk.js';
+                __s.async = true;
+                __s.onload  = __boot;
+                __s.onerror = function () {
+                  window.__TEC_PI_ERROR = true;
+                  window.dispatchEvent(new Event('tec-pi-error'));
+                };
+                document.head.appendChild(__s);
               });
             `,
           }}

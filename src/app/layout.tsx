@@ -1,3 +1,4 @@
+import { PiWarmup } from '@/components/pi/PiWarmup';
 import { RefCapture } from '@/components/referral/RefCapture';
 import { RefApply } from '@/components/referral/RefApply';
 import { LocaleProvider } from '@/lib/i18n';
@@ -93,6 +94,7 @@ export default function RootLayout({
       </head>
       <body>
         <LocaleProvider>
+          <PiWarmup />
           <RefCapture />
           <RefApply />
           {children}

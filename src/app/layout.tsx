@@ -5,6 +5,7 @@ import { LocaleProvider } from '@/lib/i18n';
 import { HUB_HOSTS } from '@/lib/pi-network';
 import type { Metadata } from 'next';
 import '@/styles/tec-design-tokens.css';
+import { ArrivalReport } from '@/components/pioneer/ArrivalReport';
 
 export const metadata: Metadata = {
   title:       'TEC System — Governance Console',
@@ -132,6 +133,7 @@ export default function RootLayout({
       <body>
         <LocaleProvider>
           <PiWarmup />
+        <ArrivalReport />
           <RefCapture />
           <RefApply />
           {children}

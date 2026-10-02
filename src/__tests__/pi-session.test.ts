@@ -112,7 +112,8 @@ describe('the payment path owns no handshake of its own', () => {
     // A raw `Pi.authenticate(` reintroduced here puts the wait back on the tap
     // AND re-opens the concurrency bug — with no symptom but a frozen button.
     const src = read('src/lib/pi-payment.ts');
-    expect(src).toContain('piSession.ensureAuth()');
+    // Through the session — with `{ fresh }` in a handoff-opened tab (template #45).
+    expect(src).toContain('piSession.ensureAuth({ fresh: enteredByHandoff() })');
     const code = src.split('\n').filter((l: string) =>
       !l.trim().startsWith('//') && !l.trim().startsWith('*'));
     expect(code.some((l: string) => /window\.Pi\.authenticate\s*\(/.test(l))).toBe(false);

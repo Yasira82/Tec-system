@@ -1,5 +1,7 @@
 'use client';
 
+import { SignInGate } from '@/components/pi/SignInGate';
+
 // TEC System — the Governance Console (C-110). SYSTEM is the Constitution Runtime:
 // it makes C-47 rules queryable and governs subscription tiers + capability
 // certification (C-94). This console is READ-ONLY — it PRESENTS the constitution.
@@ -21,7 +23,7 @@ import {
   type Policy, type TierDef, type Capability,
 } from '@/lib/system/constitution';
 
-export default function SystemConsole() {
+function SystemConsole() {
   const { t } = useTranslation();
   const { user, isLoading } = usePiAuth();
   const me = useMe(); // server-resolved Pi username (Pi Browser hides tec_user from client JS — C-123 §3)
@@ -171,4 +173,11 @@ export default function SystemConsole() {
       <BottomNav active={tab} onSelect={setTab} />
     </main>
   );
+}
+
+// The door: a sign-in button before any screen when there is no session
+// (SignInGate — C-123 §10; owner, 2026-10-06). A visit from the Hub arrives
+// signed in (§12) and goes straight through.
+export default function SystemConsoleGated() {
+  return <SignInGate><SystemConsole /></SignInGate>;
 }

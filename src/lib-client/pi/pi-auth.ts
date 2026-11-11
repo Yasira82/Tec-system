@@ -147,7 +147,7 @@ const _captureError = (message: string, data: Record<string, unknown>): void => 
         tags:  { component: 'pi-auth', type: 'incomplete-payment' },
       });
     }).catch(() => {});
-  } catch {}
+  } catch { /* the reporter itself failed — there is nowhere left to report it */ }
 };
 
 const _reportResolved = (piPaymentId: string, via: string, action?: unknown): void => {
@@ -160,7 +160,7 @@ const _reportResolved = (piPaymentId: string, via: string, action?: unknown): vo
         data:     { piPaymentId, via, action },
       });
     }).catch(() => {});
-  } catch {}
+  } catch { /* the reporter itself failed — there is nowhere left to report it */ }
 };
 
 const _addBreadcrumb = (message: string, data: Record<string, unknown>): void => {
@@ -173,7 +173,7 @@ const _addBreadcrumb = (message: string, data: Record<string, unknown>): void =>
         data,
       });
     }).catch(() => {});
-  } catch {}
+  } catch { /* the reporter itself failed — there is nowhere left to report it */ }
 };
 
 // ── Helper — قراءة CSRF token من الـ cookie ───────────────

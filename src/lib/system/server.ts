@@ -3,6 +3,7 @@ import {
   type Policy, type Enforcement, type TierDef, type Tier,
   type Capability, type GovernanceStatus,
 } from './constitution';
+import { gatewayFetch } from '@/lib/gateway-fetch';
 
 // Server-only System backend access (C-110). Calls the real System governance
 // projection (identity-service) via the gateway with the inter-service key, and maps
@@ -52,7 +53,7 @@ export function capabilityFromBackend(c: Record<string, unknown>): Capability {
 async function gwGet(path: string): Promise<Record<string, unknown> | null> {
   if (!GW) return null;
   try {
-    const res = await fetch(`${GW}${path}`, { headers: gwHeaders(), cache: 'no-store' });
+    const res = await gatewayFetch(`${GW}${path}`, { headers: gwHeaders(), cache: 'no-store' });
     if (res.ok) return (await res.json().catch(() => null))?.data ?? null;
   } catch { /* fall through to the curated projection */ }
   return null;
@@ -97,7 +98,7 @@ export interface ResolvedPolicy { policy: Policy | null; source: 'live' | 'proje
 export async function resolvePolicy(id: string): Promise<ResolvedPolicy> {
   if (GW) {
     try {
-      const res = await fetch(`${GW}/api/identity/system/policy/${encodeURIComponent(id)}`, {
+      const res = await gatewayFetch(`${GW}/api/identity/system/policy/${encodeURIComponent(id)}`, {
         headers: gwHeaders(), cache: 'no-store',
       });
       if (res.ok) {

@@ -53,7 +53,7 @@ export function capabilityFromBackend(c: Record<string, unknown>): Capability {
 async function gwGet(path: string): Promise<Record<string, unknown> | null> {
   if (!GW) return null;
   try {
-    const res = await fetch(`${GW}${path}`, { headers: gwHeaders(), cache: 'no-store' });
+    const res = await gatewayFetch(`${GW}${path}`, { headers: gwHeaders(), cache: 'no-store' });
     if (res.ok) return (await res.json().catch(() => null))?.data ?? null;
   } catch { /* fall through to the curated projection */ }
   return null;

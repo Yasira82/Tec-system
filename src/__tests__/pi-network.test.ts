@@ -118,13 +118,14 @@ describe('the client and the server read the same fact separately', () => {
   });
 });
 
+
 // ── Hub-entry detection: BOTH hosts ─────────────────────────────────────────
 // ADR-007 exists because a visitor who arrived from the Hub is inside a Pi
 // session the HUB owns: this app must not Pi.init() (it poisons that session)
 // and must not Pi.authenticate() (it never answers). The detection named only
 // `hub.tecosystem.app`, so a hop from the TESTNET Hub read as standalone —
-// there is no error to catch, and the only thing the user sees is this app's
-// own 90s "Payment timed out" with the Pi wallet never having opened.
+// there is no error to catch, and the only thing the user sees is the app's
+// own payment timeout with the Pi wallet never having opened.
 describe('isHubReferrer', () => {
   it('recognises the Mainnet Hub — unchanged', async () => {
     const { isHubReferrer } = await import('@/lib/pi-network');
@@ -140,7 +141,8 @@ describe('isHubReferrer', () => {
 
   it('is not fooled by a host that merely CONTAINS a Hub name', async () => {
     // The old check was `referrer.includes('hub.tecosystem.app')`, and that
-    // direction fails OPEN: a hostile referrer could force Mode 1.
+    // direction fails OPEN: a hostile referrer could force Mode 1 and choose
+    // the Hub URL the buyer is sent to.
     const { isHubReferrer } = await import('@/lib/pi-network');
     for (const r of [
       'https://hub.tecosystem.app.attacker.com/x',
@@ -165,7 +167,7 @@ describe('isHubReferrer', () => {
     // were not also a recognised hub REFERRER, the return hop would look
     // standalone and the next buy would hang the same way.
     const { isHubReferrer, hubPaymentOrigin, HUB_HOSTS } = await import('@/lib/pi-network');
-    const testnetHubOrigin = hubPaymentOrigin('https://hub.tecosystem.app', 'tec-system.vercel.app');
+    const testnetHubOrigin = hubPaymentOrigin('https://hub.tecosystem.app', 'tec-app.vercel.app');
     expect(isHubReferrer(`${testnetHubOrigin}/hub?pay=1`)).toBe(true);
     expect(HUB_HOSTS).toContain(new URL(testnetHubOrigin).hostname);
   });

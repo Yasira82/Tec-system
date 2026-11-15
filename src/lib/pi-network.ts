@@ -104,6 +104,7 @@ export const hubPaymentOrigin = (configuredHubUrl: string, host?: string | null)
     : HUB_TESTNET_LEGACY;
 };
 
+
 /**
  * The Hub's hosts — BOTH of them. The one list every hub-entry check reads.
  *
@@ -112,7 +113,7 @@ export const hubPaymentOrigin = (configuredHubUrl: string, host?: string | null)
  * session the HUB owns. This app must then not call `Pi.init()` (it poisons
  * that session) and must not call `Pi.authenticate()` (it never answers). The
  * detection was a substring test for `hub.tecosystem.app` — the MAINNET Hub,
- * and only it — in three separate places.
+ * and only it.
  *
  * On the Testnet pair the Hub is `tec-app-frontend.vercel.app`. So every hop
  * from the Testnet Hub into a Testnet app was INVISIBLE to ADR-007: the app
@@ -124,6 +125,9 @@ export const hubPaymentOrigin = (configuredHubUrl: string, host?: string | null)
  * The guard was never wrong about Mainnet. It was blind on exactly half the
  * hosts it has to cover, which is the same shape as every other bug in this
  * series: one build, two hosts, a constant that names one of them.
+ *
+ * `hubPaymentOrigin` above already knew about the second Hub. The outbound
+ * half of the journey knew there were two; the inbound half knew of one.
  *
  * ── Why hostname, not substring ─────────────────────────────────────────────
  * `referrer.includes('hub.tecosystem.app')` also matches
